@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagos - Tutor</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef6f0;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #A5DFF1;
+      padding: 12px 30px;
+      border-bottom: 2px solid #ccc;
+    }
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    nav img {
+      margin-left: auto;
+      height: 110px;
+    }
+    .contenedor {
+      background-color: #ffe0c3;
+      margin: 30px;
+      padding: 20px;
+      border-radius: 16px;
+    }
+    h1 {
+      color: #a1412c;
+    }
+    .filtros {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .filtros select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    thead {
+      background-color: #fcd6b1;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #fff6ef;
+    }
+    .estado {
+      padding: 6px 12px;
+      border-radius: 20px;
+      color: white;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .Pagado { background-color: #4caf88; }
+    .Vencida { background-color: #7b61ff; }
+    .Pendiente { background-color: #e55959; }
+    .acciones button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .total-pago {
+      display: flex;
+      justify-content: end;
+      align-items: center;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    .btn-pagar {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .importe-total {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal-pago {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-pago.oculto {
+  display: none;
+}
+
+.modal-contenido {
+  background-color: #fffefc;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.modal-contenido h2 {
+  color: #a1412c;
+  margin-bottom: 20px;
+}
+
+.modal-contenido label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #444;
+}
+
+.modal-contenido input,
+.modal-contenido select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.acciones-formulario {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.acciones-formulario button {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.acciones-formulario button:first-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+.acciones-formulario .cancelar {
+  background-color: #e55959;
+  color: white;
+}
+
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/tutor/inicioTutor.html"><i data-lucide="home"></i>Inicio</a>
+  <a href="/tutor/asistenciaSaludTutor.html"><i data-lucide="stethoscope"></i>Asistencia y salud</a>
+  <a href="/tutor/rutinasDiariasTutor.html"><i data-lucide="clock"></i>Rutinas Diarias</a>
+  <a href="/tutor/mensajesTutor.html"><i data-lucide="mail"></i>Mensajes</a>
+  <a href="/tutor/pagosTutor.html"><i data-lucide="credit-card"></i>Pagos</a>
+  <a href="/tutor/perfilTutor.html"><i data-lucide="user"></i>Mi Perfil</a>
+  <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" />
+</nav>
+
+  <div class="contenedor">
+    <h1>Administración y pagos</h1>
+    <div class="filtros">
+      <select id="buscar-mes" onchange="filtrar()">
+        <option value="">Mes</option>
+        <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+        <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+        <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+        <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <select id="buscar-año" onchange="filtrar()"></select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Estado</th>
+          <th>Fecha de vencimiento</th>
+          <th>Importe</th>
+          <th>Seleccionar</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-pagos"></tbody>
+    </table>
+
+    <div class="total-pago">
+      <button class="btn-pagar" onclick="mostrarFormularioPago()">Pagar</button>
+       <span class="importe-total">$ 0,00</span>
+    </div>
+  </div>
+
+<script>
+  const { jsPDF } = window.jspdf;
+  let pagos = [];
+  let tutorNombre = '';
+  let niñoNombre = '';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    lucide.createIcons();
+    llenarAnios();
+    await obtenerDatosTutor();
+    await cargarPagos();
+  });
+
+  async function obtenerDatosTutor() {
+    try {
+      const res = await fetch('/api/tutor-y-nino');
+      const data = await res.json();
+      tutorNombre = data.nombreTutor;
+      niñoNombre = data.nombreNiño;
+    } catch (error) {
+      console.error('❌ Error al obtener nombres:', error);
+    }
+  }
+
+  function llenarAnios() {
+    const select = document.getElementById('buscar-año');
+    const actual = new Date().getFullYear();
+    for (let i = actual; i >= actual - 5; i--) {
+      const op = document.createElement('option');
+      op.value = i;
+      op.textContent = i;
+      select.appendChild(op);
+    }
+  }
+
+  async function cargarPagos() {
+    try {
+      const res = await fetch('/api/pagos-tutor');
+      pagos = await res.json();
+      filtrar();
+    } catch (error) {
+      console.error('Error al cargar pagos:', error);
+    }
+  }
+
+  function filtrar() {
+    const mes = parseInt(document.getElementById('buscar-mes').value);
+    const anio = parseInt(document.getElementById('buscar-año').value);
+    const tbody = document.getElementById('tabla-pagos');
+    tbody.innerHTML = '';
+    let total = 0;
+
+    pagos.forEach((pago) => {
+      const fecha = new Date(pago.fecha_vencimiento);
+      const nombreMes = fecha.toLocaleString('es-AR', { month: 'long' });
+      const coincideMes = !mes || (fecha.getMonth() + 1 === mes);
+      const coincideAnio = !anio || (fecha.getFullYear() === anio);
+
+      if (coincideMes && coincideAnio) {
+        const monto = parseFloat(pago.monto);
+        const montoFormateado = monto.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+        const fechaFormateada = fecha.toLocaleDateString('es-AR');
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</td>
+            <td><span class="estado ${pago.estado}">${pago.estado}</span></td>
+            <td>${fechaFormateada}</td>
+            <td>$${montoFormateado}</td>
+            <td><input type="checkbox" onchange="actualizarTotal(this, ${monto})"></td>
+            <td class="acciones">
+              <button title="Descargar" onclick="descargarBoleta('${nombreMes}', '${pago.estado}', '${fechaFormateada}', ${monto}, false)">
+                <i data-lucide="download"></i>
+              </button>
+              <button title="Imprimir" onclick="descargarBoleta('${nombreMes}', '${pago.estado}', '${fechaFormateada}', ${monto}, true)">
+                <i data-lucide="printer"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    document.querySelector('.importe-total').textContent = `$ ${total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+    lucide.createIcons();
+  }
+
+  function actualizarTotal(checkbox, monto) {
+    const totalSpan = document.querySelector('.importe-total');
+    let actual = parseFloat(totalSpan.textContent.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+    actual += checkbox.checked ? monto : -monto;
+    totalSpan.textContent = `$ ${actual.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+  }
+
+  async function descargarBoleta(mes, estado, fecha, monto, imprimir = false) {
+    const doc = new jsPDF();
+
+    // Cargar imagen del logo
+    const response = await fetch('/img/LogoLuzDeLuna.png');
+    const blob = await response.blob();
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const logo = reader.result;
+      doc.addImage(logo, 'PNG', 78, 10, 50, 50);
+
+      doc.setFontSize(20);
+      doc.setTextColor('#4a90a4');
+      doc.text('Jardín Maternal', 105, 65, { align: 'center' });
+      doc.setTextColor('#f4ad75');
+      doc.text('Luz de Luna', 105, 75, { align: 'center' });
+
+      doc.setFillColor('#f4ad75');
+      doc.roundedRect(20, 85, 170, 12, 3, 3, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(14);
+      doc.text('BOLETA DE PAGO', 105, 93, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.setTextColor('#555');
+
+      const datos = [
+        ['Nombre del niño/a', niñoNombre],
+        ['Nombre del tutor/a', tutorNombre],
+        ['Mes a pagar', mes],
+        ['Importe', `$ ${parseFloat(monto).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`],
+        ['Fecha de vencimiento', fecha]
+      ];
+
+      let y = 110;
+      datos.forEach(([campo, valor]) => {
+        doc.rect(20, y, 170, 10);
+        doc.text(`${campo}:`, 25, y + 7);
+        doc.text(`${valor}`, 95, y + 7);
+        y += 12;
+      });
+
+      let x = 20;
+      y += 20;
+      for (let i = 0; i < 80; i++) {
+        const w = Math.random() > 0.5 ? 1.2 : 0.5;
+        doc.setFillColor(0, 0, 0);
+        doc.rect(x, y, w, 25, 'F');
+        x += w + 0.5;
+      }
+
+      if (imprimir) {
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const win = window.open(pdfUrl);
+        win.onload = () => win.print();
+      } else {
+        doc.save(`Boleta_${mes}_${fecha.replace(/\//g, '-')}.pdf`);
+      }
+    };
+
+    reader.readAsDataURL(blob);
+  }
+
+  function mostrarFormularioPago() {
+  document.getElementById('formularioPago').classList.remove('oculto');
+}
+
+function cerrarFormularioPago() {
+  document.getElementById('formularioPago').classList.add('oculto');
+}
+
+function confirmarPago() {
+  alert("💳 Pago confirmado correctamente (simulado).");
+  cerrarFormularioPago();
+}
+</script>
+<!-- Modal oculto -->
+<div id="formularioPago" class="modal-pago oculto">
+  <div class="modal-contenido">
+    <h2>Formulario de Pago</h2>
+    
+    <label>Método de pago:</label>
+    <select>
+      <option value="tarjeta">Tarjeta</option>
+      <option value="transferencia">Transferencia</option>
+      <option value="efectivo">Efectivo</option>
+    </select>
+
+    <label>Nombre del titular:</label>
+    <input type="text" placeholder="Ej: Juan Pérez" />
+
+    <label>Número de tarjeta:</label>
+    <input type="text" placeholder="XXXX-XXXX-XXXX-1234" />
+
+    <label>Fecha de vencimiento:</label>
+    <input type="month" />
+
+    <label>CVV:</label>
+    <input type="text" placeholder="123" />
+
+    <div class="acciones-formulario">
+      <button onclick="confirmarPago()">Confirmar</button>
+      <button class="cancelar" onclick="cerrarFormularioPago()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

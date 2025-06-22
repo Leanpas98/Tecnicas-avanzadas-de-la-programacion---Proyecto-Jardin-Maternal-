@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="estilos-registro.css">
+  <style>
+    #mensajeRegistro {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .mensaje-exito {
+      color: green;
+    }
+    .mensaje-error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="registro-container">
+    <h2>Registro de Usuario</h2>
+    <form id="registroForm">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required>
+
+      <label for="apellido">Apellido:</label>
+      <input type="text" id="apellido" name="apellido" required>
+
+      <label for="usuario">Nombre de usuario:</label>
+      <input type="text" id="usuario" name="usuario" required>
+
+      <label for="email">Correo electrónico:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="contraseña">Contraseña:</label>
+      <input type="password" id="contraseña" name="contraseña" required>
+
+      <label for="rol">Tipo de usuario:</label>
+      <select id="rol" name="rol" required>
+        <option value="">Seleccionar...</option>
+        <option value="tutor">Tutor</option>
+        <option value="maestra">Maestra</option>
+        <option value="administrador">Administrador</option>
+      </select>
+
+      <!-- Campos para Tutor -->
+      <div id="camposTutor" class="campos-dinamicos" style="display:none;">
+        <label for="DNI">DNI:</label>
+        <input type="text" id="DNI" name="DNI"required>
+
+        <label for="domicilio">Domicilio:</label>
+        <input type="text" id="domicilio" name="domicilio"required>
+
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" name="telefono"required>
+
+      </div>
+
+      <!-- Campos para Maestra -->
+      <div id="camposMaestra" class="campos-dinamicos" style="display:none;">
+        <label for="dniMaestra">DNI:</label>
+        <input type="text" id="dniMaestra" name="dniMaestra">
+
+        <label for="domicilioMaestra">Domicilio:</label>
+        <input type="text" id="domicilioMaestra" name="domicilioMaestra">
+
+        <label for="telefonoMaestra">Teléfono:</label>
+        <input type="text" id="telefonoMaestra" name="telefonoMaestra">
+
+        <label for="titulo">Título o formación:</label>
+        <input type="text" id="titulo" name="titulo">
+      </div>
+
+      <button type="submit">Registrarse</button>
+    </form>
+    <p id="mensajeRegistro"></p>
+  </div>
+
+  <script>
+    const rolSelect = document.getElementById('rol');
+    const camposTutor = document.getElementById('camposTutor');
+    const camposMaestra = document.getElementById('camposMaestra');
+    const mensajeRegistro = document.getElementById('mensajeRegistro');
+
+    rolSelect.addEventListener('change', () => {
+      const rol = rolSelect.value;
+      camposTutor.style.display = rol === 'tutor' ? 'block' : 'none';
+      camposMaestra.style.display = rol === 'maestra' ? 'block' : 'none';
+    });
+
+    const form = document.getElementById('registroForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const datos = Object.fromEntries(formData.entries());
+
+      try {
+        const respuesta = await fetch('/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+
+        const resultado = await respuesta.json();
+
+        mensajeRegistro.textContent = resultado.message;
+        mensajeRegistro.className = resultado.ok ? 'mensaje-exito' : 'mensaje-error';
+
+        if (resultado.ok) {
+          form.reset();
+          camposTutor.style.display = 'none';
+          camposMaestra.style.display = 'none';
+        }
+
+      } catch (err) {
+        console.error('Error en el registro:', err);
+        mensajeRegistro.textContent = 'Error de conexión con el servidor';
+        mensajeRegistro.className = 'mensaje-error';
+      }
+    });
+  </script>
+</body>
+</html>

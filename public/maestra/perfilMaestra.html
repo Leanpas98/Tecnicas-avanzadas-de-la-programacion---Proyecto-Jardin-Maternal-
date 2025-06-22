@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Perfil - Maestra</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff7f1;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #A5DFF1;
+      padding: 12px 30px;
+      border-bottom: 2px solid #ccc;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav img {
+      margin-left: auto;
+      height: 110px;
+    }
+
+    .contenedor-perfil {
+      max-width: 700px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 30px 40px;
+    }
+
+    h1 {
+      color: #a1412c;
+      text-align: center;
+    }
+
+    .info-item {
+      margin: 10px 0;
+    }
+
+    .info-item label {
+      display: inline-block;
+      width: 140px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .info-item input {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 60%;
+    }
+
+    .acciones {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .acciones button {
+      background-color: #f29e77;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .mensaje-confirmacion {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/maestra/InicioMaestra.html"><i data-lucide="home"></i>Inicio</a>
+    <a href="/maestra/asistenciaSalud.html"><i data-lucide="stethoscope"></i>Asistencia y salud</a>
+    <a href="/maestra/rutinasDiarias.html"><i data-lucide="clock"></i>Rutinas Diarias</a>
+    <a href="/maestra/mensajesMaestra.html"><i data-lucide="mail"></i>Mensajes</a>
+    <a href="/maestra/perfilMaestra.html"><i data-lucide="user"></i>Mi Perfil</a>
+    <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" />
+  </nav>
+
+  <div class="contenedor-perfil">
+    <h1>👩‍🏫 Mi Perfil</h1>
+    <div class="info-item"><label>Nombre:</label> <input id="nombre" /></div>
+    <div class="info-item"><label>Apellido:</label> <input id="apellido" /></div>
+    <div class="info-item"><label>Usuario:</label> <input id="usuario" disabled /></div>
+    <div class="info-item"><label>Correo:</label> <input id="mail" /></div>
+    <div class="info-item"><label>Teléfono:</label> <input id="telefono" /></div>
+    <div class="info-item"><label>DNI:</label> <input id="dni" disabled /></div>
+    <div class="info-item"><label>Domicilio:</label> <input id="domicilio" /></div>
+    <div class="info-item"><label>Título:</label> <input id="titulo" disabled /></div>
+
+    <div class="acciones">
+      <button onclick="guardarCambios()">Guardar</button>
+      <button onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+    <div class="mensaje-confirmacion" id="mensaje-exito">Perfil actualizado con éxito.</div>
+  </div>
+
+  <script>
+    async function cargarPerfil() {
+      const res = await fetch('/api/perfil', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        alert('Error al cargar el perfil.');
+        return;
+      }
+      const datos = await res.json();
+      document.getElementById('nombre').value = datos.nombre;
+      document.getElementById('apellido').value = datos.apellido;
+      document.getElementById('usuario').value = datos.nombreUsuario;
+      document.getElementById('mail').value = datos.mail;
+      document.getElementById('telefono').value = datos.telefono;
+      document.getElementById('dni').value = datos.DNI;
+      document.getElementById('domicilio').value = datos.domicilio;
+      document.getElementById('titulo').value = datos.titulo || '';
+    }
+
+    async function guardarCambios() {
+      const cambios = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        mail: document.getElementById('mail').value,
+        telefono: document.getElementById('telefono').value,
+        domicilio: document.getElementById('domicilio').value
+      };
+
+      const res = await fetch('/api/perfil', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(cambios)
+      });
+
+      if (res.ok) {
+        document.getElementById('mensaje-exito').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('mensaje-exito').style.display = 'none';
+        }, 4000);
+      } else {
+        alert('No se pudo actualizar el perfil.');
+      }
+    }
+
+    async function cerrarSesion() {
+      const res = await fetch('/logout', { method: 'POST', credentials: 'include' });
+      if (res.ok) {
+        window.location.href = '/login.html';
+      } else {
+        alert('No se pudo cerrar la sesión.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      cargarPerfil();
+    });
+  </script>
+</body>
+</html>

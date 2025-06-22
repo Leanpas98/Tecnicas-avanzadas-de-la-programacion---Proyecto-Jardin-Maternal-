@@ -1,0 +1,161 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Jardín Maternal "Luz de Luna"</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fef6f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #fff;
+      border: 2px solid #f2c0a2;
+      border-radius: 12px;
+      padding: 30px 40px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #c25b4c;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      text-align: left;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #f29e77;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #ec875c;
+    }
+
+    .logo {
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 25px auto;
+      display: block;
+    }
+
+    .extra-links {
+      margin-top: 15px;
+    }
+
+    .extra-links a {
+      display: block;
+      margin-top: 8px;
+      color: #c25b4c;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .extra-links a:hover {
+      text-decoration: underline;
+    }
+
+    #mensaje-error {
+      color: red;
+      margin-top: 10px;
+      min-height: 18px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="img/LogoLuzDeLuna.png" alt="Luz de Luna Logo" class="logo" />
+    <h2>Iniciar sesión</h2>
+
+    <form id="form-login">
+      <label for="usuario">Usuario:</label>
+      <input type="text" id="usuario" name="usuario" required />
+
+      <label for="contraseña">Contraseña:</label>
+      <input type="password" id="contraseña" name="contraseña" required />
+
+      <button type="submit">Entrar</button>
+      <p id="mensaje-error"></p>
+    </form>
+
+    <div class="extra-links">
+      <a href="/registro.html">¿No tienes cuenta? Regístrate</a>
+      <a href="/recuperar.html">¿Olvidaste tu contraseña?</a>
+    </div>
+  </div>
+
+ <script>
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value;
+    const contraseña = document.getElementById('contraseña').value;
+    const errorP = document.getElementById('mensaje-error');
+
+    try {
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ Importante para que funcione la sesión
+        body: JSON.stringify({ usuario, contraseña })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        sessionStorage.setItem('usuarioId', data.id_usuario);
+        
+        if (data.rol === 'maestra') {
+          window.location.href = '/maestra/InicioMaestra.html';
+        } else if (data.rol === 'administrador') {
+          window.location.href = '/admin/inicioAdmin.html';
+        } else if (data.rol === 'tutor') {
+          window.location.href = '/tutor/inicioTutor.html';
+        } else {
+          errorP.textContent = 'Rol no válido o sin permisos.';
+        }
+      } else {
+        errorP.textContent = data.message || 'Credenciales incorrectas';
+      }
+    } catch (error) {
+      errorP.textContent = 'Error de conexión con el servidor.';
+      console.error('Error:', error);
+    }
+  });
+</script>
+</body>
+</html>

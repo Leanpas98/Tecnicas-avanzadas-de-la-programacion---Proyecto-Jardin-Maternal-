@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recuperar Contraseña</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fff6f1;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .recuperar-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      color: #333;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ff8a65;
+      margin-bottom: 20px;
+    }
+
+    form input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      background-color: #fffdfc;
+      transition: border 0.2s ease-in-out;
+      box-sizing: border-box;
+    }
+
+    form input:focus {
+      border-color: #ffab91;
+      outline: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: #ff8a65;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #ff7043;
+    }
+
+    #mensaje {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      color: #d84315;
+    }
+
+    #mensaje.success {
+      color: #388e3c; /* verde para éxito */
+    }
+  </style>
+</head>
+<body>
+  <div class="recuperar-container">
+    <h2>Recuperar Contraseña</h2>
+    <form id="form-recuperar">
+      <input type="text" name="usuario" placeholder="Usuario" required />
+      <button type="submit">Recuperar</button>
+    </form>
+    <p id="mensaje"></p>
+  </div>
+
+  <script>
+    document.getElementById('form-recuperar').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const usuario = e.target.usuario.value.trim();
+      const mensajeElem = document.getElementById('mensaje');
+
+      try {
+        const res = await fetch('/recuperar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario })
+        });
+
+        const data = await res.json();
+
+        mensajeElem.textContent = data.message;
+        if (data.ok) {
+          mensajeElem.className = 'success';
+        } else {
+          mensajeElem.className = '';
+        }
+
+      } catch (error) {
+        mensajeElem.textContent = 'Error de conexión. Intente más tarde.';
+        mensajeElem.className = '';
+      }
+    });
+  </script>
+</body>
+</html>

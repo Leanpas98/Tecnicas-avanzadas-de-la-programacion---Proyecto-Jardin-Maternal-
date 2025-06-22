@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscripción - Jardín Maternal Luz de Luna</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #FFE7D0;
+      padding: 40px 20px;
+    }
+
+    .contenedor {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #A14128;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #3c3c3c;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, textarea, select {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #F4A300;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #d88b00;
+    }
+
+    .volver {
+      display: inline-block;
+      margin-top: 25px;
+      color: #1565c0;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .volver:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <h1>Formulario de Inscripción</h1>
+    <p>Completá tus datos para iniciar la inscripción al Jardín Maternal Luz de Luna.</p>
+    
+    <form action="/procesar-inscripcion" method="post">
+      <!-- Datos del niño/a -->
+      <input type="text" name="nombre_nino" placeholder="Nombre del niño/a" required>
+      <input type="text" name="apellido_nino" placeholder="Apellido del niño/a" required>
+      <input type="date" name="fecha_nacimiento" placeholder="Fecha de nacimiento" required>
+
+      <!-- Datos del tutor -->
+      <input type="text" name="nombre_tutor" placeholder="Nombre del padre, madre o tutor" required>
+      <input type="email" name="email" placeholder="Correo electrónico" required>
+      <input type="tel" name="telefono" placeholder="Teléfono de contacto" required>
+
+      <!-- Grupo/sala -->
+      <select name="grupo_sala" required>
+        <option value="">Seleccioná una sala</option>
+        <option value="1">Sala Lactantes</option>
+        <option value="2">Sala Deambuladores</option>
+        <option value="3">Sala 2 años</option>
+      </select>
+
+      <!-- Observaciones -->
+      <textarea name="observacion" placeholder="Contanos si necesitás turno, sala o alguna consulta específica..." rows="4"></textarea>
+
+      <button type="submit">Enviar Inscripción</button>
+    </form>
+
+    <a href="inicio.html" class="volver">← Volver al inicio</a>
+  </div>
+
+</body>
+</html>

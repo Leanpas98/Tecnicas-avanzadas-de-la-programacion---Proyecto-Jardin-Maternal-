@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inicio - Jardín Maternal Luz de Luna</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #FFE7D0;
+}
+
+header {
+  background-color: #A5DFF1;
+  padding: 12px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contenedor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  flex: 1;
+  margin-left: 300px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.logo-header {
+  height: 140px;
+  background-color: #A5DFF1;
+  padding: 8px;
+  border-radius: 20px;
+}
+
+.acceso-btn {
+  background-color: #D9D9D9;
+  border: 2px solid #91cde3;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: bold;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  margin-right: 15px;
+  font-size: 20px;
+  color: black;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.acceso-btn:hover {
+  transform: translateY(-2px);
+}
+
+.fondo {
+  height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFE7D0;
+}
+
+.imagen-central {
+  width: 80%;
+  max-width: none;
+  height: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: block;
+  margin: auto;
+}
+
+.nosotros {
+  background-color: #FFE7D0;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.nosotros h2 {
+  font-size: 50px;
+  font-family: 'Segoe UI', cursive;
+  color: #2c2c2c;
+  margin-bottom: 15px;
+}
+
+.nosotros .resaltado {
+  color: #A14128;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 25px;
+}
+
+.nosotros p {
+  font-size: 16px;
+  color: #3c3c3c;
+  margin-bottom: 15px;
+  max-width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.imagenes-nosotros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+  padding: 0 20px;
+}
+
+.imagenes-nosotros img {
+  width: 82%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.salitas {
+  background-color: #FFE7D0;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.salitas h2 {
+  font-size: 50px;
+  font-family: 'Segoe UI', cursive;
+  color: #2c2c2c;
+  margin-bottom: 10px;
+}
+
+.salitas .resaltado {
+  color: #A14128;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.salitas .descripcion {
+  font-size: 15px;
+  color: #3c3c3c;
+  margin: 0 auto 40px auto;
+  max-width: 750px;
+  line-height: 1.6;
+}
+
+.contenedor-salas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.sala {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sala img {
+  width: 300px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.sala img:hover {
+  transform: scale(1.05);
+}
+
+.visitanos {
+  background-color: #FFE7D0;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.titulo-visitanos {
+  font-size: 60px;
+  font-family: 'Segoe UI', cursive;
+  color: #1f1f1f;
+  margin-bottom: 10px;
+}
+
+.subtitulo-visitanos {
+  color: #A14128;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.contenido-visitanos p {
+  font-size: 16px;
+  color: #3c3c3c;
+  max-width: 800px;
+  margin: 0 auto 15px auto;
+  line-height: 1.6;
+}
+
+.logo-visitanos img {
+  height: 200px;
+  margin-top: 20px;
+}
+
+.seguinos {
+  margin-top: 30px;
+  font-weight: bold;
+  color: #A14128;
+  font-size: 18px;
+}
+
+.redes p {
+  margin: 5px auto;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #3c3c3c;
+}
+
+.info-contacto p {
+  font-size: 14px;
+  color: #3c3c3c;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.inscripciones {
+  background-color: #FFF1E0;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.inscripciones-contenido h2 {
+  font-size: 36px;
+  color: #A14128;
+  margin-bottom: 20px;
+}
+
+.inscripciones-contenido p {
+  font-size: 16px;
+  color: #3c3c3c;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.btn-inscribite {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  background-color: #F4A300;
+  color: white;
+  font-weight: bold;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-inscribite:hover {
+  background-color: #d88b00;
+}
+
+/* Botón Volver arriba */
+.volver-arriba {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #F4A300;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.volver-arriba:hover {
+  background-color: #d88b00;
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="contenedor-header">
+      <nav class="menu">
+        <a href="#nosotros">¿Quiénes somos?</a>
+        <a href="#salitas">Salitas</a>
+        <a href="#inscripciones">Inscripciones</a>
+        <a href="#visitanos">Contactanos</a>
+      </nav>
+      <div style="display: flex; align-items: center;">
+        <a href="/login.html" class="acceso-btn">↓ Registro / Acceso</a>
+        <img src="img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" class="logo-header" />
+      </div>
+    </div>
+  </header>
+
+  <section class="fondo">
+    <img src="img/BienvenidosALuzDeLuna.png" alt="Imagen central" class="imagen-central" />
+  </section>
+
+  <!-- Sección Nosotros con id -->
+  <section id="nosotros" class="nosotros">
+    <h2>Nosotros</h2>
+    <p class="resaltado">Cuando están bien en el jardín, Ustedes trabajan tranquilos.</p>
+    <p>En Luz de Luna, acompañamos a las Mamás y Papás que tienen que ir a trabajar y necesitan que cuiden y mimen a sus hijos.</p>
+    <p>Llevamos más de 26 años, comprometidos con el cuidado de niños y niñas. <br>
+    Junto al hermoso equipo de docentes, nos apasiona mimarlos y crear experiencias que día a día los hagan crecer felices!</p>
+    <div class="imagenes-nosotros">
+      <img src="img/Salitas.png" alt="Imagen central" class="imagen-central" />
+    </div>
+  </section>
+
+  <!-- Sección Salitas con id -->
+  <section id="salitas" class="salitas">
+    <h2>Salitas</h2>
+    <p class="resaltado">Descubrí que hacen en cada una.</p>
+    <p class="descripcion">
+      Desde los 45 días y hasta los 3 años nuestros grupos están organizados considerando el desarrollo integral de cada niño, buscando priorizar que el cuidado y la estimulación sean acorde a cada etapa.<br>
+      Bebés (45 días a 1 año); deambuladores (1 a 2 años) y sala de 2 años (2 a 3 años).
+    </p>
+    <div class="contenedor-salas">
+      <div class="sala">
+        <img src="img/abejitas.png" alt="Sapitos">
+      </div>
+      <div class="sala">
+        <img src="img/sapitos.png" alt="Abejitas">
+      </div>
+      <div class="sala">
+        <img src="img/vaquitas.png" alt="Vaquitas">
+      </div>
+    </div>
+  </section>
+  <!-- Sección Inscripciones con id -->
+  <section id="inscripciones" class="inscripciones">
+    <div class="inscripciones-contenido">
+      <h2>¡Inscripciones Abiertas!</h2>
+      <p>Sumate a nuestra comunidad y asegurá tu lugar en <strong>Jardín Maternal Luz de Luna</strong>.</p>
+      <p>Completá el formulario de inscripción y nos pondremos en contacto con vos a la brevedad.</p>
+      <a href="inscripcion.html" class="btn-inscribite">Inscribite Ahora</a>
+    </div>
+  </section>
+  <!-- Sección Visitanos con id -->
+  <section id="visitanos" class="visitanos">
+    <h2 class="titulo-visitanos">Visitanos</h2>
+    <p class="subtitulo-visitanos">Te vas a enamorar del jardín...</p>
+    <div class="contenido-visitanos">
+      <p>Vení a conocernos y descubrí porqué tantas familias confían en Luz de Luna.</p>
+      <p>Nuestra propuesta de trabajo está pensada para que además de aprender, se diviertan y sean felices durante su estadía en el jardín.</p>
+      <p>Trabajamos con proyectos pedagógicos, con planificaciones mensuales adaptadas a las necesidades de cada grupo.
+        Nos encanta nuestro parque y fomentamos las actividades al aire libre generando contacto con la naturaleza y
+        disfrutando de los días lindos.</p>
+    </div>
+    <div class="logo-visitanos">
+      <img src="img/LogoLuzDeLuna.png" alt="Logo Luz de Luna">
+    </div>
+    <p class="seguinos">Seguinos en:</p>
+    <div class="redes">
+      <p>
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook">
+        Facebook: Luz de luna maternal
+      </p>
+      <p>
+        <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" alt="Instagram">
+        Instagram: Luzdeluna_ok
+      </p>
+    </div>
+    <div class="info-contacto">
+      <p>Ciudad de Buenos Aires, Flores, Av. Bonorino 1120</p>
+      <p>Horarios: Lunes a Viernes de 08:00 hs a 18:00 hs.</p>
+      <p>Tel. 4274950 luzdeluna@gmail.com.ar</p>
+    </div>
+  </section>
+  <button class="volver-arriba" onclick="scrollToTop()">↑ Volver arriba</button>
+<script>
+  // Mostrar/ocultar botón volver arriba
+  const btnArriba = document.querySelector('.volver-arriba');
+  window.addEventListener('scroll', () => {
+    btnArriba.style.display = window.scrollY > 300 ? 'block' : 'none';
+  });
+
+  // Scroll suave hacia arriba
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Resaltar sección activa en el menú
+  const secciones = document.querySelectorAll("section[id]");
+  const links = document.querySelectorAll(".menu a");
+
+  window.addEventListener("scroll", () => {
+    let scrollY = window.pageYOffset;
+
+    secciones.forEach((seccion) => {
+      const altura = seccion.offsetHeight;
+      const top = seccion.offsetTop - 100;
+      const id = seccion.getAttribute("id");
+
+      if (scrollY >= top && scrollY < top + altura) {
+        links.forEach((link) => {
+          link.classList.remove("active");
+          if (link.getAttribute("href") === `#${id}`) {
+            link.classList.add("active");
+          }
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

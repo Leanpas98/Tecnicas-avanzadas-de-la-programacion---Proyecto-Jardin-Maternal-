@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rutinas Diarias - Maestra</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef6f0;
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #A5DFF1;
+      padding: 12px 30px;
+      border-bottom: 2px solid #ccc;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      gap: 6px;
+    }
+
+    nav img {
+      margin-left: auto;
+      height: 110px;
+    }
+
+    .contenedor {
+      background-color: #ffe0c3;
+      margin: 30px;
+      padding: 20px;
+      border-radius: 16px;
+    }
+
+    h1 {
+      color: #a1412c;
+      margin-bottom: 20px;
+    }
+
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filtros input, .filtros select {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    thead {
+      background-color: #fcd6b1;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #fff6ef;
+    }
+
+    .nombre-con-foto {
+      display: flex;
+      align-items: center;
+    }
+
+    .foto-bebe {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/maestra/InicioMaestra.html"><i data-lucide="home"></i>Inicio</a>
+  <a href="/maestra/asistenciaSalud.html"><i data-lucide="stethoscope"></i>Asistencia y salud</a>
+  <a href="/maestra/rutinasDiarias.html"><i data-lucide="clock"></i>Rutinas Diarias</a>
+  <a href="/maestra/mensajesMaestra.html"><i data-lucide="mail"></i>Mensajes</a>
+  <a href="/maestra/perfilMaestra.html"><i data-lucide="user"></i>Mi Perfil</a>
+  <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" />
+</nav>
+
+<div class="contenedor">
+  <h1>Rutinas Diarias</h1>
+  <div class="filtros">
+    <select id="buscar-sala" onchange="aplicarFiltros()">
+      <option value="">Todas las salas</option>
+      <option value="abejitas">Sala abejitas</option>
+      <option value="sapitos">Sala sapitos</option>
+      <option value="vaquitas">Sala vaquitas</option>
+    </select>
+    <input type="text" id="buscar-nombre" placeholder="Buscar Nombre" oninput="aplicarFiltros()" />
+    <input type="date" id="buscar-fecha" onchange="cargarRutinas()" />
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre Bebé</th>
+        <th>Alimentación</th>
+        <th>Sueño</th>
+        <th>Actividades</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-rutinas"></tbody>
+  </table>
+</div>
+
+<script>
+let datos = [];
+let filtroNombre = '';
+let filtroFecha = '';
+let filtroSala = '';
+
+async function cargarRutinas() {
+  const fecha = document.getElementById('buscar-fecha').value;
+  if (!fecha) return;
+
+  try {
+    const res = await fetch(`/api/rutinas-diarias?fecha=${fecha}`);
+    datos = await res.json();
+    aplicarFiltros();
+  } catch (error) {
+    console.error('Error al cargar rutinas:', error);
+  }
+}
+
+function aplicarFiltros() {
+  filtroSala = document.getElementById('buscar-sala').value.toLowerCase();
+  filtroNombre = document.getElementById('buscar-nombre').value.toLowerCase();
+  filtroFecha = document.getElementById('buscar-fecha').value;
+
+  let registrosFiltrados = datos.filter(d =>
+    (!filtroSala || (d.grupo_sala || '').toLowerCase() === filtroSala)
+  );
+
+  if (filtroNombre) {
+    registrosFiltrados = registrosFiltrados.filter(d =>
+      (d.nombre_niño || '').toLowerCase().includes(filtroNombre) ||
+      (d.apellido_niño || '').toLowerCase().includes(filtroNombre)
+    );
+  }
+
+  mostrarTabla(registrosFiltrados);
+}
+
+function mostrarTabla(registros) {
+  const tbody = document.getElementById("tabla-rutinas");
+  tbody.innerHTML = "";
+
+  if (registros.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="5">No hay registros para mostrar</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  registros.forEach(row => {
+    if (!row.id_rutina_diaria) row.nuevo = true;
+    const editable = row.nuevo || row.editando || !row.id_rutina_diaria;
+
+    const nombre = row.nombre_niño || "—";
+    const apellido = row.apellido_niño || "";
+    const foto = (row.grupo_sala || "").toLowerCase();
+    const fotoURL = `/img/salas/${foto}.png`;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="nombre-con-foto">
+        <img src="${fotoURL}" class="foto-bebe" alt="${foto}" onerror="this.src='https://via.placeholder.com/32';" />
+        ${nombre} ${apellido}
+      </td>
+      <td>${editable ? `<input value="${row.alimentacion || ''}" />` : row.alimentacion || "—"}</td>
+      <td>${editable ? `<input value="${row.sueño || ''}" />` : row.sueño || "—"}</td>
+      <td>${editable ? `<input value="${row.actividades || ''}" />` : row.actividades || "—"}</td>
+      <td>
+        ${editable
+          ? `<button onclick="guardarFila(this, ${row.id_rutina_diaria || null}, ${row.id_niño}, true)">💾</button>`
+          : `<button onclick="editarFila(this)">✏️</button>`}
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function editarFila(btn) {
+  const fila = btn.closest("tr");
+  const index = [...fila.parentElement.children].indexOf(fila);
+  datos[index].editando = true;
+  aplicarFiltros();
+}
+
+async function guardarFila(btn, id_rutina, id_niño, esNuevo) {
+  const fila = btn.closest("tr");
+  const inputs = fila.querySelectorAll("input");
+  const valores = [...inputs].map(i => i.value.trim());
+
+  const body = {
+    alimentacion: valores[0],
+    sueño: valores[1],
+    actividades: valores[2],
+    id_niño,
+    fecha: document.getElementById('buscar-fecha').value
+  };
+
+  if (esNuevo && !id_rutina) {
+    await fetch('/api/rutinas-diarias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } else {
+    await fetch(`/api/rutinas-diarias/${id_rutina}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  }
+
+  await cargarRutinas();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  cargarRutinas();
+  lucide.createIcons();
+});
+</script>
+
+</body>
+</html>

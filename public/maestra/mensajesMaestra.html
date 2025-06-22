@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Centro de Mensajes</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff7f1;
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #A5DFF1;
+      padding: 12px 30px;
+      border-bottom: 2px solid #ccc;
+    }
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    nav img {
+      margin-left: auto;
+      height: 110px;
+    }
+    .contenedor-chat {
+      display: flex;
+      height: calc(100vh - 120px);
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #e6f7fc;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .sidebar input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .contacto {
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .contacto:hover, .contacto.activo {
+      background-color: #A5DFF1;
+    }
+    .principal {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .principal h1 {
+      color: #a1412c;
+      text-align: center;
+    }
+    #mensajes {
+      flex: 1;
+      overflow-y: auto;
+      margin: 20px 0;
+      background: #fff3e8;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .mensaje {
+      display: inline-block;
+      max-width: 70%;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      word-wrap: break-word;
+    }
+    .mensaje.propio {
+      background-color: #cce5ff;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .mensaje.otro {
+      background-color: #f0f0f0;
+      align-self: flex-start;
+      text-align: left;
+    }
+    .mensaje .fecha {
+      font-size: 11px;
+      color: #777;
+      margin-top: 5px;
+    }
+    .formulario {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+    textarea {
+      flex: 1;
+      resize: none;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #A5DFF1;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .fecha-grupo {
+      text-align: center;
+      font-style: italic;
+      margin: 10px 0;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/maestra/InicioMaestra.html"><i data-lucide="home"></i>Inicio</a>
+    <a href="/maestra/asistenciaSalud.html"><i data-lucide="stethoscope"></i>Asistencia y salud</a>
+    <a href="/maestra/rutinasDiarias.html"><i data-lucide="clock"></i>Rutinas Diarias</a>
+    <a href="/maestra/mensajesMaestra.html"><i data-lucide="mail"></i>Mensajes</a>
+    <a href="/maestra/perfilMaestra.html"><i data-lucide="user"></i>Mi Perfil</a>
+    <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" />
+  </nav>
+
+  <div class="contenedor-chat">
+    <div class="sidebar">
+      <strong>Conversaciones</strong>
+      <input type="text" placeholder="Buscar..." id="buscador" oninput="filtrarConversaciones()" />
+      <div id="lista-conversaciones"></div>
+    </div>
+    <div class="principal">
+      <h1>📬 Centro de Mensajes</h1>
+      <label>Enviar mensaje a:
+        <select id="receptor" onchange="cargarMensajes()"></select>
+      </label>
+      <div id="mensajes"></div>
+      <form class="formulario" onsubmit="enviarMensaje(event)">
+        <textarea id="contenido" placeholder="Escribe un mensaje..."></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+<script>
+  let usuarioLogueado = parseInt(sessionStorage.getItem('usuarioId')) || 3;
+  let usuarios = [];
+  let receptorSeleccionado = null;
+  let intervaloMensajes = null;
+
+  async function cargarUsuarios() {
+    const res = await fetch('/api/usuarios');
+    usuarios = await res.json();
+
+    const selector = document.getElementById('receptor');
+    const lista = document.getElementById('lista-conversaciones');
+    selector.innerHTML = '';
+    lista.innerHTML = '';
+
+    usuarios.forEach(u => {
+      if (u.id_usuario == usuarioLogueado) return;
+      selector.innerHTML += `<option value="${u.id_usuario}">${u.nombreUsuario}</option>`;
+      const div = document.createElement('div');
+      div.textContent = u.nombreUsuario;
+      div.classList.add('contacto');
+      div.onclick = () => seleccionarReceptor(u.id_usuario);
+      lista.appendChild(div);
+    });
+
+    await cargarConversacionesReales();
+    if (selector.options.length > 0) {
+      receptorSeleccionado = selector.value;
+      cargarMensajes();
+      iniciarRecarga();
+    }
+  }
+
+  async function cargarConversacionesReales() {
+    const res = await fetch(`/api/conversaciones/${usuarioLogueado}`);
+    const conversados = await res.json();
+
+    const lista = document.getElementById('lista-conversaciones');
+    const selector = document.getElementById('receptor');
+
+    conversados.forEach(u => {
+      if (!usuarios.find(us => us.id_usuario == u.id_usuario)) {
+        const div = document.createElement('div');
+        div.textContent = u.nombreUsuario;
+        div.classList.add('contacto');
+        div.onclick = () => seleccionarReceptor(u.id_usuario);
+        lista.appendChild(div);
+
+        const option = document.createElement('option');
+        option.value = u.id_usuario;
+        option.textContent = u.nombreUsuario;
+        selector.appendChild(option);
+      }
+    });
+  }
+
+  function seleccionarReceptor(id) {
+    receptorSeleccionado = id;
+    document.getElementById('receptor').value = id;
+    cargarMensajes();
+    reiniciarRecarga();
+  }
+
+  async function cargarMensajes() {
+    const res = await fetch(`/api/mensajes?emisor=${usuarioLogueado}&receptor=${receptorSeleccionado}`);
+    const mensajes = await res.json();
+    const contenedor = document.getElementById('mensajes');
+    contenedor.innerHTML = '';
+    let ultimaFecha = '';
+    mensajes.forEach(msg => {
+      const fecha = new Date(msg.fecha);
+      const fechaStr = fecha.toLocaleDateString();
+      const horaStr = fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (fechaStr !== ultimaFecha) {
+        contenedor.innerHTML += `<div class='fecha-grupo'>${fechaStr}</div>`;
+        ultimaFecha = fechaStr;
+      }
+      const clase = String(msg.id_emisor) === String(usuarioLogueado) ? 'propio' : 'otro';
+      contenedor.innerHTML += `<div class="mensaje ${clase}">${msg.contenido}<div class="fecha">${horaStr}</div></div>`;
+    });
+    contenedor.scrollTop = contenedor.scrollHeight;
+  }
+
+  async function enviarMensaje(e) {
+    e.preventDefault();
+    const contenido = document.getElementById('contenido').value.trim();
+    if (!contenido) return;
+
+    const res = await fetch('/api/mensajes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emisor: usuarioLogueado,
+        receptor: receptorSeleccionado,
+        contenido
+      })
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('contenido').value = '';
+      cargarMensajes();
+    } else {
+      console.error("❌ Error del backend:", data);
+    }
+  }
+
+  function iniciarRecarga() {
+    if (intervaloMensajes) clearInterval(intervaloMensajes);
+    intervaloMensajes = setInterval(cargarMensajes, 5000);
+  }
+
+  function reiniciarRecarga() {
+    clearInterval(intervaloMensajes);
+    iniciarRecarga();
+  }
+
+  function filtrarConversaciones() {
+    const texto = document.getElementById('buscador').value.toLowerCase();
+    const contactos = document.querySelectorAll('.contacto');
+    contactos.forEach(c => {
+      c.style.display = c.textContent.toLowerCase().includes(texto) ? 'block' : 'none';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    cargarUsuarios();
+  });
+</script>
+</body>
+</html>

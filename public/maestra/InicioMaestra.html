@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio Maestra</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff7f1;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #A5DFF1;
+      padding: 12px 30px;
+      border-bottom: 2px solid #ccc;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #222;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav img {
+      margin-left: auto;
+      height: 110px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      color: #ea6d26;
+      margin: 30px 0 10px;
+    }
+
+    .contenedor {
+      display: flex;
+      justify-content: center;
+      padding: 0 40px 60px;
+    }
+
+    .tarjeta {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .tarjeta h2 {
+      font-size: 22px;
+      color: #2c2c5c;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .evento {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      background-color: #fff3e0;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .evento input {
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      width: 90%;
+    }
+
+    .evento input:focus {
+      outline: none;
+      background: #fffbe8;
+    }
+
+    .calendario {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .calendario div {
+      padding: 14px;
+      background: #ffe7d0;
+      border-radius: 10px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .calendario .hoy {
+      background-color: #ffb877;
+    }
+
+    .logo-jardin {
+      max-width: 150px;
+      height: auto;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    button.edit {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .contenedor {
+        padding: 0 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/maestra/InicioMaestra.html"><i data-lucide="home"></i>Inicio</a>
+  <a href="/maestra/asistenciaSalud.html"><i data-lucide="stethoscope"></i>Asistencia y salud</a>
+  <a href="/maestra/rutinasDiarias.html"><i data-lucide="clock"></i>Rutinas Diarias</a>
+  <a href="/maestra/mensajesMaestra.html"><i data-lucide="mail"></i>Mensajes</a>
+  <a href="/maestra/perfilMaestra.html"><i data-lucide="user"></i>Mi Perfil</a>
+  <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" />
+</nav>
+
+<h1>¡Bienvenida, Seño! <span style="font-size: 30px;">🧡</span></h1>
+
+<div class="contenedor">
+  <div class="tarjeta">
+    <h2>🌈 Eventos de la semana</h2>
+    <img src="/img/LogoLuzDeLuna.png" alt="Logo Luz de Luna" class="logo-jardin" />
+
+    <div id="eventos-lista">
+      <!-- Eventos dinámicos -->
+    </div>
+
+    <h2><i data-lucide="calendar"></i> Calendario</h2>
+    <div class="calendario" id="calendario"></div>
+  </div>
+</div>
+
+<script>
+  const hoy = new Date();
+  const contenedorEventos = document.getElementById('eventos-lista');
+  const calendario = document.getElementById('calendario');
+  const dias = ['D','L','M','M','J','V','S'];
+  const totalDias = 30;
+
+  const eventosIniciales = [
+    { titulo: 'Salida al parque', fecha: '2025-06-15', hora: '10:00' },
+    { titulo: 'Taller de arte', fecha: '2025-06-16', hora: '14:30' },
+    { titulo: 'Día de cuentos', fecha: '2025-06-17', hora: '09:00' },
+    { titulo: 'Merienda especial', fecha: '2025-06-18', hora: '16:00' },
+    { titulo: 'Reunión con padres', fecha: '2025-06-19', hora: '18:00' },
+  ];
+
+  let eventos = JSON.parse(localStorage.getItem('eventos_maestra')) || eventosIniciales;
+
+  function guardarEventos() {
+    localStorage.setItem('eventos_maestra', JSON.stringify(eventos));
+  }
+
+  function renderizarEventos() {
+    contenedorEventos.innerHTML = '';
+    eventos.forEach((evento, index) => {
+      const div = document.createElement('div');
+      div.className = 'evento';
+      div.innerHTML = `
+        <input type="text" value="${evento.titulo} - ${evento.fecha} ${evento.hora}" id="input-${index}" readonly>
+        <button class="edit" onclick="editarEvento(${index})">✏️</button>
+      `;
+      contenedorEventos.appendChild(div);
+    });
+  }
+
+  function editarEvento(index) {
+    const input = document.getElementById(`input-${index}`);
+    if (input.readOnly) {
+      input.readOnly = false;
+      input.focus();
+    } else {
+      input.readOnly = true;
+      const partes = input.value.split(' - ');
+      if (partes.length === 2) {
+        const [titulo, fechaHora] = partes;
+        const [fecha, hora] = fechaHora.trim().split(' ');
+        eventos[index] = { titulo: titulo.trim(), fecha: fecha.trim(), hora: hora.trim() };
+        guardarEventos();
+        renderizarEventos();
+      }
+    }
+  }
+
+  dias.forEach(d => calendario.innerHTML += `<div style="background:#fffaf5;">${d}</div>`);
+  for (let i = 1; i <= totalDias; i++) {
+    const clase = i === hoy.getDate() ? 'hoy' : '';
+    calendario.innerHTML += `<div class="${clase}">${i}</div>`;
+  }
+
+  renderizarEventos();
+  lucide.createIcons();
+</script>
+
+</body>
+</html>
