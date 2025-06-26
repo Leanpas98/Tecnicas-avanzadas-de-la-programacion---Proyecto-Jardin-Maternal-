@@ -48,13 +48,13 @@
       <!-- Campos para Tutor -->
       <div id="camposTutor" class="campos-dinamicos" style="display:none;">
         <label for="dniTutor">DNI:</label>
-        <input type="text" id="dniTutor" name="dniTutor" required>
+        <input type="text" id="dniTutor" name="dniTutor">
 
         <label for="domicilioTutor">Domicilio:</label>
-        <input type="text" id="domicilioTutor" name="domicilioTutor" required>
+        <input type="text" id="domicilioTutor" name="domicilioTutor">
 
         <label for="telefonoTutor">Teléfono:</label>
-        <input type="text" id="telefonoTutor" name="telefonoTutor" required>
+        <input type="text" id="telefonoTutor" name="telefonoTutor">
       </div>
 
       <!-- Campos para Maestra -->
@@ -83,10 +83,47 @@
     const camposMaestra = document.getElementById('camposMaestra');
     const mensajeRegistro = document.getElementById('mensajeRegistro');
 
+    const toggleRequired = (elements, required) => {
+      elements.forEach(el => {
+        if (required) {
+          el.setAttribute('required', true);
+        } else {
+          el.removeAttribute('required');
+        }
+      });
+    };
+
     rolSelect.addEventListener('change', () => {
       const rol = rolSelect.value;
-      camposTutor.style.display = rol === 'tutor' ? 'block' : 'none';
-      camposMaestra.style.display = rol === 'maestra' ? 'block' : 'none';
+
+      const tutorFields = [
+        document.getElementById('dniTutor'),
+        document.getElementById('domicilioTutor'),
+        document.getElementById('telefonoTutor')
+      ];
+      const maestraFields = [
+        document.getElementById('dniMaestra'),
+        document.getElementById('domicilioMaestra'),
+        document.getElementById('telefonoMaestra'),
+        document.getElementById('titulo')
+      ];
+
+      if (rol === 'tutor') {
+        camposTutor.style.display = 'block';
+        camposMaestra.style.display = 'none';
+        toggleRequired(tutorFields, true);
+        toggleRequired(maestraFields, false);
+      } else if (rol === 'maestra') {
+        camposTutor.style.display = 'none';
+        camposMaestra.style.display = 'block';
+        toggleRequired(tutorFields, false);
+        toggleRequired(maestraFields, true);
+      } else {
+        camposTutor.style.display = 'none';
+        camposMaestra.style.display = 'none';
+        toggleRequired(tutorFields, false);
+        toggleRequired(maestraFields, false);
+      }
     });
 
     const form = document.getElementById('registroForm');
